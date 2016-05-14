@@ -340,6 +340,20 @@ AP: 整合性よりも可用性を選んだ
 
 # 内部データ構造
 
+ディスク
+- commit log: commit logは書き込みを行った時に最初に書き込まれる場所。クラッシュリカバリーのために使われる。SSTableにデータがフラッシュされると役目を終える。
+- SSTable: memtableのオブジェクトの数が一定数以上になるとSSTableに非同期にフラッシュされる。このとき新しいmemtableが作られる。SSTableはイミュータブル。
+
+メモリー
+- memtable: commit logのデータは次にmemtableに移動される。テーブルごとにmemtableは作られる。JVMヒープとoff-heapメモリーに保存される。
+- key cache: partition keyからrowインデックスへのmap。JVMヒープ上に保存される
+- row cache: row全体のキャッシュ。off-heapメモリーに保存される。
+- counter cache: カウンタのキャッシュ
+
+.footnote[
+[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch6. Memtables, SSTables, and Commit Logs
+]
+
 ---
 
 # コンパクション
