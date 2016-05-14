@@ -358,8 +358,14 @@ AP: 整合性よりも可用性を選んだ
 
 # コンパクション
 
+- SSTableは追記しかされないので書き込みの性能は高い。しかし読み込み時に無駄が発生してしまう。
+- コンパクションはキーをマージしtombstoneを破棄しソートを行い新しくインデックスを作ることで読み込みを最適化する
+- コンパクションは定期的に行われる
+- 実行時には古いSSTablesの読み込みと新しいSSTableの書き込みが発生し、一時的にディスクI/Oとデータ使用量が上昇する
+- major compactionは複数のSSTableを１つにまとめる。使用は推奨されない。
+
 .footnote[
-[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch6. Compaction
+[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch6. Compaction, Ch12. Compaction
 ]
 
 ---
