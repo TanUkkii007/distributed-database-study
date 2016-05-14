@@ -89,7 +89,7 @@ CP: 可用性よりも整合性を選んだ
 - コモディティーなハードウェア: 特殊なハードウェアを必要とせず、ありふれたマシンでクラスターを組む。壊れること前提。
 
 
-[HDG4](http://shop.oreilly.com/product/0636920033448.do) Ch3. The Design of HDFS
+.footnote[[HDG4](http://shop.oreilly.com/product/0636920033448.do) Ch3. The Design of HDFS]
 
 
 ---
@@ -101,11 +101,58 @@ CP: 可用性よりも整合性を選んだ
 - 低レイテンシなデータアクセス: 数10msオーダーのアクセスは無理。レイテンシよりスループットを重視。
 - 大量の小さなファイル: 1台のnamenodeがすべてのファイルのメタデータをメモリー上に持つので、多くのファイルは扱えない。100万オーダーはいけるが10億オーダーは無理。
 
-[HDG4](http://shop.oreilly.com/product/0636920033448.do) Ch3. The Design of HDFS
+.footnote[[HDG4](http://shop.oreilly.com/product/0636920033448.do) Ch3. The Design of HDFS]
 
 ---
 
 # アーキテクチャー
+
+![HDFS Architecture](http://itm-vm.shidler.hawaii.edu/HDFS/BlockReplication.gif)
+
+---
+
+# サポートされているオペレーション
+
+---
+
+# Write Path
+
+![HDFS Write Path](http://cfs22.simplicdn.net/ice9/free_resources_article_thumb/Cracking_Hadoop_Dev_Interview_63.jpg)
+
+.footnote[[HDG4](http://shop.oreilly.com/product/0636920033448.do) Ch3. Data Flow Anatomy of a File Write]
+
+???
+1. DistributedFileSystem#create()を呼ぶ
+2. namenodenにRPCしてブロックが割り与えられていないファイルシステムの名前空間にファイルを作る. namenodeはファイルが存在しないことを確認し権限をチェックする。DistributedFileSystemはFSDataOutputStreamを返す.
+3. データはデータキューに書かれ、DataStreamerがそれを消費し
+4. replication level分の一連のdataノードのはパイプラインを構築し、パケットを保存しては次のdatanodeにフォワードする。
+5. DFSOutputStreamはackキューも持っており、datanodeからackが返ってきたらパケットをデキューする。最小レプリカ数(デフォルトは1)を満たせたら書き込み成功。残り(デフォルトは3)は非同期にレプリケーションされる。
+6. 書き込みが終了したらclose()を呼び、パケットをフラッシュする。
+7. namenodeに完了を通知
+
+---
+
+# Read Path
+
+![HDFS Read Path](http://songcy.net/post-attachments/1/data-reading-in-HDFS.jpg)
+
+.footnote[[HDG4](http://shop.oreilly.com/product/0636920033448.do) Ch3. Data Flow Anatomy of a File Read]
+
+???
+1. DistributedFileSystem#open()を呼びファイルを開く
+2. namenodeにRPCし最初の数ブロックの位置を取得. namenodeはブロックごとにdatanodeのアドレスを返す
+3. DistributedFileSystemが返したDFSInputStreamのread()を呼び、最初のブロックのdatanodeに接続
+4. read()を繰り返し呼び、datanodeからデータを読む
+5. ブロックの終了位置に来たらDFSInputStreamはdatanodeとコネクションを切り次のブロックを別のdatanodeから読む
+6. 終わったらFSDataInputStreamのclose()を呼ぶ
+
+---
+
+# さらに掘り下げる項目
+
+- 大きなデータに最適化されているとはどういうことか？
+- 書き込みが失敗した場合の対処
+- namenodeの冗長性
 
 ---
 
