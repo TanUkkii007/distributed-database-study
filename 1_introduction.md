@@ -214,6 +214,8 @@ AP: 整合性よりも可用性を選んだ
 
 ---
 
+class: center, middle
+
 # アーキテクチャー
 
 ---
@@ -375,6 +377,38 @@ AP: 整合性よりも可用性を選んだ
 ---
 
 # データモデリング
+
+用語
+- keyspace: tableのコンテナ
+- table: rowのコンテナ
+- row: primary keyで参照されるcolumnのコンテナ
+- column: 名前と値のペア
+- wide row: 非常に多くのcolumnをもつrow。partitionとも言う。
+- composite key: wide rowを表現する特殊なprimary key
+- partition key: composite keyを構成するキー。保存するノードを決定するために使う。複数のcolumnから成ることもある。
+- clustering key: composite keyを構成するキー。データのソート順を決める。
+- static column: primary keyの一部ではなくすべてのrowで共有されるcolumn
+- secondary index: primary key以外のcolumnでクエリーをすることを可能にするキー
+
+.footnote[
+[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch4. Cassandra’s Data Model
+]
+
+---
+
+# データモデリング
+
+- クエリーファースト
+- ストレージを意識して最適化
+- 非正規化
+- No join, no relation
+- Chebotko Diagramなどで可視化
+
+<img src="https://d3ansictanv2wj.cloudfront.net/cass_05_chebotko_logical-733194ef2128d09b7f13ab078dc0e889.png" height="240px">
+
+.footnote[
+[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch5. Data Modeling
+]
 
 ---
 
