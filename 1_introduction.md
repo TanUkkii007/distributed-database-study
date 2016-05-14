@@ -312,21 +312,25 @@ AP: 整合性よりも可用性を選んだ
 
 # Hinted Handoff
 
+- 書き込み時にレプリカノードが（ネットワーク分断などで）利用できない時がある
+- コーディネーターノードは書き込めなかったときにヒントを残す
+- レプリカノードが復活した時はヒントをもとに書き込みを回復させる
+- この機能を **hinted handoff**という
+
 .footnote[
 [CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch6. Hinted Handoff
 ]
 
 ---
 
-# Compaction
+# Anti-Entropyプロトコルとリペア
 
-.footnote[
-[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch6. Compaction
-]
-
----
-
-# Anti-Entropy, Repair and Merkle Trees
+- Cassandraはレプリケーションされたデータ間の不整合を修復するために **anti-entropyプロトコル**を使う
+- anti-entropyプロトコルはレプリカデータを比較して違いを調和させる
+- レプリカの同期には **readリペア**と **anti-entropyリペア**の２つのモードがある
+- readリペアは整合性レベルを満たすために複数のレプリカからデータを読み、古いデータをもつ場合には更新をかける
+- anti-entropyリペアは手動メンテナンスの１つで、major compactionを引き起こし、テーブルのハッシュ表現であるMerkleツリーを比較し修正を行う
+- hinted handoffは書き込み時のanti-entropyメカニズムと考える事ができる
 
 .footnote[
 [CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch6. Anti-Entropy, Repair and Merkle Trees
@@ -335,6 +339,14 @@ AP: 整合性よりも可用性を選んだ
 ---
 
 # 内部データ構造
+
+---
+
+# コンパクション
+
+.footnote[
+[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch6. Compaction
+]
 
 ---
 
