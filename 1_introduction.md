@@ -107,11 +107,27 @@ CP: 可用性よりも整合性を選んだ
 
 # アーキテクチャー
 
-![HDFS Architecture](http://itm-vm.shidler.hawaii.edu/HDFS/BlockReplication.gif)
+namenode
+
+- ファイルシステムのツリーとメタデータを管理する
+- ファイルのブロックがどのdatanodeに属するかを知っている。起動時にdatanodeからブロックの情報を受け取り、メモリー上に保存する。
+- namespace imageとedit logの２つのファイルを永続化する
+- namenodeの情報が失われるとdatanodeのブロックからファイルを再現する方法が分からなくなりファイルシステムとして機能しなくなる
+
+datanode
+
+- ブロックを保存する
 
 ---
 
 # サポートされているオペレーション
+
+- FileSystem#create
+- FileSystem.get
+- FileSystem#open
+- FileSystem#listStatus
+- FileSystem.mkdirs
+- FileSystem.exists
 
 ---
 
@@ -491,6 +507,12 @@ class: center, middle
 
 # サポートされているオペレーション
 
+- SELECT
+- INSERT
+- DELETE
+- TRUNCATE
+- Lightweight Transaction
+
 ---
 
 # データモデル
@@ -532,13 +554,14 @@ class: center, middle
 
 # Write Path
 
+
 ---
 
 # Read Path
 
 ---
 
-# Lightweight Transaction
+# Materialized View
 
 ---
 
