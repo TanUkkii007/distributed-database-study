@@ -212,6 +212,7 @@ CP: 可用性よりも整合性を選んだ
 - regionは連続した一連のrow
 - region serverが複数のregionを担当する
 - regionが一定以上の大きさになると２つに分割される( *splitting*)
+- splittingはコンパクションとは反対の動きをする
 
 .footnote[
 [HBDG2](http://shop.oreilly.com/product/0636920033943.do) Ch1. Auto-Sharding
@@ -220,10 +221,18 @@ CP: 可用性よりも整合性を選んだ
 
 ---
 
+# ロードバランシング
+
+- region serverが新しく参加したり落ちたり、regionが分割されたりすると、regionの分布に偏りが出る
+- master serverはregionの分布が均一になるように一定間隔でロードバランサーを実行する
+- regionの移動中は一時的にデータが見えなくなる
+
+---
+
 # コンパクション
 
 - memstoreがいっぱいになりディスクにフラッシュすると、小さなファイルがHDFS上にたくさんできてしまう
-- コンパクションは定期的に小さなファイルを１つのファイルにまとめ上げる
+- **コンパクション**は定期的に小さなファイルを１つのファイルにまとめ上げる
 - コンパクションには **minor compaction**と **major compaction**がある
 - minor compactionは一部のHFileのみを対象にする。TTLや最大バージョン数を超えたcellやdelete markerがついたcellもここで削除する（delete markerは消さない）。
 - major compactionはすべてのHFileを対象にする。minor compactionの動作に加えdelete markerも削除する。
@@ -231,11 +240,6 @@ CP: 可用性よりも整合性を選んだ
 .footnote[
 [AHA](http://shop.oreilly.com/product/0636920035688.do) Ch2. Compaction
 ] 
-
----
-
-# ロードバランシング
-
 
 ---
 
