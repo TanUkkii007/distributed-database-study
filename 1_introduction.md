@@ -165,16 +165,43 @@ class: center, middle
 
 # HBaseって何？
 
+分散ファイルシステム上で動くHadoopプロジェクトのBigTableクローン
 
 ---
 
 # HBase, BigTableが生まれた理由
+
+GFSやHDFSでは大量の小さなファイルを扱うことやランダムアクセスに弱かった。GFSやHDFS上のデータ処理に使っていたMapReduceではリアルタイムにデータを処理することができなかった。これらをするには分散ファイルシステム上にストレージエンジンを構築する必要があった。
 
 ---
 
 # CAPの定理に当てはめると
 
 CP: 可用性よりも整合性を選んだ
+
+---
+
+# アーキテクチャー
+
+![HBase Architecture](https://www.safaribooksonline.com/library/view/hbase-the-definitive/9781449314682/httpatomoreillycomsourceoreillyimages889242.png)
+
+.footnote[[HBDG2](http://shop.oreilly.com/product/0636920033943.do) Ch1. Building Blocks]
+
+---
+
+# データモデル
+
+用語
+- namespace: tableの集合
+- table: rowの集合
+- row: row keyで一意に識別されるcolumnの集合。row keyに基づき辞書順にソートされている。
+- column family: columnのグループ。テーブルを作るときに指定する。HFileの保存単位。大抵tableに１つ。
+- column: 値。 *family:qualifier*で参照できる。
+- column qualifier: columnの名前。column family中のqualifierの数に上限はない。
+- version: 同一columnは複数のバージョンをもつことができる
+- cell: あるバージョンのcolumnの値
+
+.footnote[[HBDG2](http://shop.oreilly.com/product/0636920033943.do) Ch1. Namespaces, Tables, Rows, Columns, and Cells]
 
 ---
 
@@ -376,7 +403,7 @@ class: center, middle
 
 ---
 
-# データモデリング
+# データモデル
 
 用語
 - keyspace: tableのコンテナ
@@ -398,6 +425,7 @@ class: center, middle
 
 # データモデリング
 
+- 静的データ型をもつスキーマ
 - クエリーファースト
 - ストレージを意識して最適化
 - 非正規化
