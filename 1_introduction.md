@@ -277,6 +277,22 @@ region serverの役割
 
 # サポートされているオペレーション
 
+- Put
+- Get
+- Delete
+- Append: CAS
+- Mutate: Put + Delete
+- Batch: 複数のrowに対する操作
+- Scan: 複数のrowを取得する範囲検索
+- Filter
+- Coprocessor
+- Counter
+- region-local transaction
+
+.footnote[
+[HBDG2](http://shop.oreilly.com/product/0636920033943.do) Ch3. CRUD Operations, Ch4. Client API: Advanced Features
+]
+
 ---
 
 class: center, middle
