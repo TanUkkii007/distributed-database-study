@@ -420,14 +420,30 @@ class: center, middle
 
 ---
 
-# レプリケーションと整合性レベル
+# レプリケーション
 
+- replication factorでいくつデータのコピーを持つか指定する
+- 最初のノードのみpartitionerのトークンに基いて決められる。残りは **replication strategy**で位置を決定する。
+- NetworkTopologyStrategyは可用性を最大化するためネットワークトポロジーを意識してレプリカノードを決める
+- replication strategyはkeyspaceを作るときに指定する
 
 
 .footnote[
-[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch6. Replication Strategies, Ch6. Consistency Levels
+[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch6. Replication Strategies
 ]
 
+---
+
+# 整合性レベル
+
+- 書き込みや読み込みクエリーで **整合性レベル**を指定できる
+- 整合性レベルが高いほど多くのノードが応答し、レプリカの値が等しいか確認する
+- 弱い整合性レベルにはANY, ONE, TWO, THREE、強い整合性レベルにはQUORUM, ALLがある
+- QUORUMレベルはレプリカノードの過半数となる(replication factor / 2 + 1)
+
+.footnote[
+[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch6. Consistency Levels
+]
 
 ---
 
@@ -509,8 +525,10 @@ class: center, middle
 
 - SELECT
 - INSERT
+- UPDATE
 - DELETE
 - TRUNCATE
+- BEGIN BATCH
 - Lightweight Transaction
 
 ---
