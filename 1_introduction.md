@@ -107,14 +107,14 @@ CP: 可用性よりも整合性を選んだ
 
 # アーキテクチャー
 
-namenode
+**namenode**
 
 - ファイルシステムのツリーとメタデータを管理する
 - ファイルのブロックがどのdatanodeに属するかを知っている。起動時にdatanodeからブロックの情報を受け取り、メモリー上に保存する。
 - namespace imageとedit logの２つのファイルを永続化する
 - namenodeの情報が失われるとdatanodeのブロックからファイルを再現する方法が分からなくなりファイルシステムとして機能しなくなる
 
-datanode
+**datanode**
 
 - ブロックを保存する
 
@@ -256,7 +256,7 @@ region serverの役割
 
 # 自動シャーディング
 
-- スケールとロードバランシングの単位はregion
+- スケールとロードバランシングの単位は **region**
 - regionは連続した一連のrow
 - region serverが複数のregionを担当する
 - regionが一定以上の大きさになると２つに分割される( *splitting*)
@@ -272,7 +272,7 @@ region serverの役割
 # ロードバランシング
 
 - region serverが新しく参加したり落ちたり、regionが分割されたりすると、regionの分布に偏りが出る
-- master serverはregionの分布が均一になるように一定間隔でロードバランサーを実行する
+- master serverはregionの分布が均一になるように一定間隔で **ロードバランサー**を実行する
 - regionの移動中は一時的にデータが見えなくなる
 
 ---
@@ -450,7 +450,7 @@ class: center, middle
 # クエリーとコーディネーターノード
 
 - クライアントはクエリーの際にクラスターのどのノードと接続してもよい
-- 接続されたノードはコーディネーターノードとなる
+- 接続されたノードは **コーディネーターノード**となる
 - コーディネーターノードはどのノードが求められたデータのレプリカか判定し、クエリーをフォワードする
 - 書き込み時は整合性レベルとレプリケーションファクターに基づきすべてのノードに書き込みを行う
 - 読み込み時は整合性レベルを満たせる数のレプリカにアクセスする
@@ -510,7 +510,7 @@ class: center, middle
 # コンパクション
 
 - SSTableは追記しかされないので書き込みの性能は高い。しかし読み込み時に無駄が発生してしまう。
-- コンパクションはキーをマージしtombstoneを破棄しソートを行い新しくインデックスを作ることで読み込みを最適化する
+- **コンパクション**はキーをマージし **tombstone**を破棄しソートを行い新しくインデックスを作ることで読み込みを最適化する
 - コンパクションは定期的に行われる
 - 実行時には古いSSTablesの読み込みと新しいSSTableの書き込みが発生し、一時的にディスクI/Oとデータ使用量が上昇する
 - major compactionは複数のSSTableを１つにまとめる。使用は推奨されない。
@@ -560,7 +560,7 @@ class: center, middle
 - ストレージを意識して最適化
 - 非正規化
 - No join, no relation
-- Chebotko Diagramなどで可視化
+- **Chebotko Diagram**などで可視化
 
 <img src="https://d3ansictanv2wj.cloudfront.net/cass_05_chebotko_logical-733194ef2128d09b7f13ab078dc0e889.png" height="240px">
 
@@ -622,6 +622,18 @@ class: center, middle
 ---
 
 # Materialized View
+
+- **secondary index**をカーディナリティーが高いデータに使うとリングの大多数のノードを探索するハメになり使えない
+- **Materialized View**はオリジナルのclustering keyにないcolumnに対するクエリーが可能なビューを作る
+- Materialized Viewによって複数の非正規テーブルをアプリケーション側で同期する必要がなくなる
+
+```
+cqlsh> CREATE MATERIALIZED VIEW reservation.reservations_by_confirmation AS SELECT *FROM reservation.reservations_by_hotel_dateWHERE confirm_number IS NOT NULL and hotel_id IS NOT NULL andstart_date IS NOT NULL and room_number IS NOT NULLPRIMARY KEY (confirm_number, hotel_id, start_date, room_number);
+```
+
+.footnote[
+[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch5. Materialized Views
+]
 
 ---
 
