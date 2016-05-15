@@ -583,9 +583,41 @@ class: center, middle
 9. コーディネーターはレプリカがタイムアウト以内に応答しなかったらヒントを残す
 10. レプリカノードはスケジュールされたフラッシュを実行し、memtableをSSTableとして保存しcommit logを消去する。コンパクションが必要ならスケジュールする。
 
+.footnote[
+[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch9. Writing
+]
+
 ---
 
 # Read Path
+
+1. クライアントからクエリーを受け取ったノードがコーディネーターとなる
+2. コーディネーターはpartitionerでレプリカノードを決定する
+3. snitchによって一番速いレプリカを決定し、読み込みリクエストを送る
+4. コーディネーターは他のレプリカにdigest requestを送る
+5. リクエストを受けたレプリカはrow cacheをチェックする
+6. row cacheになければレプリカはmemtableとSSTableを探索する
+7. 最新のタイムスタンプのcolumnを選択し、tombstoneが付いているデータは除去し、SSTableのデータとmemtableのデータをマージする
+8. 一番速いレプリカは結果をコーディネーターに返す
+9. digest requestを受信したレプリカはデータのdigest hashを計算しコーディネーターに返す
+10. コーディネーターは一番速いレプリカが返したデータからdigest hashを計算し、他のレプリカのdigest hashと比較
+11. 整合性レベルを満たせば一番速いレプリカのデータをクライアントに返す
+
+.footnote[
+[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch9. Reading
+]
+
+---
+
+# Read Path
+
+11. 整合性レベルを満たせば一番速いレプリカのデータをクライアントに返す
+12. 整合性レベルを満たしていなければ、readリペアを行う
+13. readリペアではすべてのレプリカに読み込みリクエストを送り、コーディネーターは最新のデータになるようマージした結果をクライアントに返す。古いレプリカは結果に基づき非同期に更新される。
+
+.footnote[
+[CDG2](http://shop.oreilly.com/product/0636920043041.do) Ch9. Reading
+]
 
 ---
 
