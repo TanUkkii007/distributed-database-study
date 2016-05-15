@@ -206,6 +206,38 @@ CP: 可用性よりも整合性を選んだ
 
 ---
 
+# Master Server
+
+master serverの役割
+
+- regionの割当て
+- ロードバランシング
+- region serverの復旧
+- region splitの完了のモニタリング
+- サーバーの死活監視
+
+※ HBaseクラスターはregion serverが落ちないかつregion splitが起きないかぎりmasterがいなくても生存できる
+
+.footnote[
+[AHA](http://shop.oreilly.com/product/0636920035688.do) Ch2. HBase roles
+] 
+
+---
+
+# Region Server
+
+region serverの役割
+
+- regionをホストする。つまりデータをホストする。
+- splitやコンパクションをするか判断し実行する
+- クライアントは初回以外はregion serverとダイレクトにやりとりする。（初回はZooKeeperからmaster serverを探し、master serverからregion server一覧を得る）
+
+.footnote[
+[AHA](http://shop.oreilly.com/product/0636920035688.do) Ch2. HBase roles
+] 
+
+---
+
 # 自動シャーディング
 
 - スケールとロードバランシングの単位はregion
