@@ -181,14 +181,6 @@ CP: 可用性よりも整合性を選んだ
 
 ---
 
-# アーキテクチャー
-
-![HBase Architecture](https://www.safaribooksonline.com/library/view/hbase-the-definitive/9781449314682/httpatomoreillycomsourceoreillyimages889242.png)
-
-.footnote[[HBDG2](http://shop.oreilly.com/product/0636920033943.do) Ch1. Building Blocks]
-
----
-
 # データモデル
 
 用語
@@ -200,8 +192,54 @@ CP: 可用性よりも整合性を選んだ
 - column qualifier: columnの名前。column family中のqualifierの数に上限はない。
 - version: 同一columnは複数のバージョンをもつことができる
 - cell: あるバージョンのcolumnの値
+- tag: cellが持てるメタデータ
 
 .footnote[[HBDG2](http://shop.oreilly.com/product/0636920033943.do) Ch1. Namespaces, Tables, Rows, Columns, and Cells]
+
+---
+
+# アーキテクチャー
+
+![HBase Architecture](https://www.safaribooksonline.com/library/view/hbase-the-definitive/9781449314682/httpatomoreillycomsourceoreillyimages889242.png)
+
+.footnote[[HBDG2](http://shop.oreilly.com/product/0636920033943.do) Ch1. Building Blocks]
+
+---
+
+# 自動シャーディング
+
+- スケールとロードバランシングの単位はregion
+- regionは連続した一連のrow
+- region serverが複数のregionを担当する
+- regionが一定以上の大きさになると２つに分割される( *splitting*)
+
+.footnote[
+[HBDG2](http://shop.oreilly.com/product/0636920033943.do) Ch1. Auto-Sharding
+[AHA](http://shop.oreilly.com/product/0636920035688.do) Ch2. Splits (Auto-Sharding)
+] 
+
+---
+
+# コンパクション
+
+- memstoreがいっぱいになりディスクにフラッシュすると、小さなファイルがHDFS上にたくさんできてしまう
+- コンパクションは定期的に小さなファイルを１つのファイルにまとめ上げる
+- コンパクションには **minor compaction**と **major compaction**がある
+- minor compactionは一部のHFileのみを対象にする。TTLや最大バージョン数を超えたcellやdelete markerがついたcellもここで削除する（delete markerは消さない）。
+- major compactionはすべてのHFileを対象にする。minor compactionの動作に加えdelete markerも削除する。
+
+.footnote[
+[AHA](http://shop.oreilly.com/product/0636920035688.do) Ch2. Compaction
+] 
+
+---
+
+# ロードバランシング
+
+
+---
+
+# サポートされているオペレーション
 
 ---
 
