@@ -97,7 +97,7 @@ CP: 可用性よりも整合性を選んだ
 ## 得意なこと
 
 - 大きなファイル: 数百メガ、ギガ、テラバイトクラスのファイルを扱うよう最適化
-- ストリームによるデータアクセス: write-once, read-mannyなデータを想定。解析などに向く。
+- ストリームによるデータアクセス: write-once, read-manyなデータを想定。解析などに向く。
 - コモディティーなハードウェア: 特殊なハードウェアを必要とせず、ありふれたマシンでクラスターを組む。壊れること前提。
 
 
@@ -320,9 +320,9 @@ class: center, middle
 
 ---
 
-# Cassandraって何？
-
 class: center, middle
+
+# Cassandraって何？
 
 Cassandraはオープンソースの非集中型row-oriented分散データベース
 
@@ -373,7 +373,7 @@ class: center, middle
 # Snitch
 
 - クラスター中のノードのネットワーク上の近さを知る仕組みを **snitch**という
-- snitchhはどのノードから読み込み、書き込みをすべきかをきめるために使われる
+- snitchはどのノードから読み込み、書き込みをすべきかをきめるために使われる
 - あらかじめネットワークトポロジーを教えずに近さを判断するdynamic snitchもある
 - dynamic snitchのために修正したPhi failure detectionを使っている
 
