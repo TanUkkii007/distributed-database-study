@@ -645,3 +645,130 @@ class: center, middle
 # ZooKeeper
 
 
+---
+
+# ZooKeeperが生まれた理由
+
+> ZooKeeperは元々、Yahoo! で開発された。Yahoo! ではたくさんの大規模分散アプリケーショ ンが開発されている。われわれは、分散協調の側面が適切に扱われておらず、単一故障点を持つア プリケーションや、障害に対して脆いアプリケーションがデプロイされていることに気が付いた。 その一方で、分散協調の部分に人手を取られ、アプリケーションの機能に注力できていない開発者 もいた。さらに、われわれは、これらのアプリケーションが基本的な協調機能のいくつかを共有し ていることに気付いた。だから、われわれは、一度実装してしまえばさまざまなアプリケーション で使い回しできる一般的な解決法を見つけようとしたのだ。ZooKeeper は、われわれが思ってい たよりもはるかに汎用性があり、広く使われるようになった。
+
+.footnote[
+[ZDPC](http://www.oreilly.co.jp/books/9784873116938/) 1.4 ZooKeeperは成功した。但し書きつきで
+]
+
+---
+
+# CAPの定理に当てはめると
+
+CP: 可用性よりも整合性を選んだ（ZooKeeper本にはACと書いてある）
+
+※ ZooKeeperはネットワークが分断した時でも読み出しだけはできる
+
+---
+
+# データ構造
+
+ZooKeeperはデータをznodeという単位で管理する。
+
+znodeはファイルシステムのように階層構造をなす。
+
+znodeはパス形式の名前で参照できる。
+
+znodeの値はバイト配列である。
+
+<img src="https://s3.amazonaws.com/files.dezyre.com/images/blog/Zookeeper+and+Oozie%3A+Hadoop+Workflow+and+Cluster+managers/Zookeeper+Data+Model.png" height="240px">
+
+.footnote[
+[ZDPC](http://www.oreilly.co.jp/books/9784873116938/) 2.1 ZooKeeperの基本
+]
+
+---
+
+# 永続znodeと短命znode
+
+- 永続(persistent)znodeは明示的にdeleteを呼び出さないと消せない
+- 短命(ephemeral)znodeはこのznodeを作ったクライアントがクラッシュしたり、接続がクローズされたりすると自動的に削除される
+
+master-workerアプリケーションの場合`/master`や`workers/worker-*` znodeは短命znodeになる。
+masterがクラッシュしたらフェイルオーバーしなければいけないし、workerがクラッシュしたらタスクを割り当ててはいけないからだ。
+`/tasks/task-*`は永続znodeになる。タスクの登録者がクラッシュしようがタスクは消えてはいけないからだ。
+
+.footnote[
+[ZDPC](http://www.oreilly.co.jp/books/9784873116938/) 2.1.2 znodeのモード
+]
+
+---
+
+# シーケンシャルznode
+
+シーケンシャルznodeは単調に増加するユニークな整数値が与えられる
+
+`/tasks/task-`を指定してシーケンシャルznodeを作ると、`/tasks/task-1`, `/tasks/task-2`, ...のようにパスが作られる
+
+.footnote[
+[ZDPC](http://www.oreilly.co.jp/books/9784873116938/) 2.1.2 znodeのモード
+]
+
+---
+
+# サポートされているオペレーション
+
+- create
+- getData
+- setData
+- exists
+- getChildren
+- delete
+
+---
+
+# 監視と通知
+
+ZooKeeperではポーリングではなく監視と通知を行う。
+
+以下のオペレーションではznodeに監視を適用できる
+
+- getData
+- exists
+- getChildren
+
+監視は１度きりの操作で、１回の通知しか引き起こさない。継続的に通知をもらうには再度監視を登録する
+
+ZookKeeperはクライアントが観測する更新の順序を保証する。通知は他の変更が同じznodeに加えられるよりも先にクライアントに配送される。
+
+.footnote[
+[ZDPC](http://www.oreilly.co.jp/books/9784873116938/) 2.1.3 監視と通知
+]
+
+---
+
+# セッション
+
+---
+
+class: center, middle
+
+# アーキテクチャー
+
+---
+
+# ZooKeeperアンサンブル
+
+複数のZooKeeperサーバーでクラスターを組む。この単位をアンサンブルという。
+
+ZooKeeperアンサンブルは一般的に３，５，７などの奇数台で構成する。
+
+---
+
+# リーダー、フォロワー、オブザーバー
+
+ZooKeeperアンサンブルのうち１つはリーダーの役割をもち、それ以外はフォロワーとなる。
+
+リーダーは、シー ケンサーとして機能し、ZooKeeper 状態の更新の順序を決定する。
+
+フォロワーは、状態の更新が クラッシュに耐えることを保証するために、リーダーが提案する更新を受け取り、投票を行う。
+
+オブザーバーはこの過程に関与せず、スケーラビリティのためにある。
+
+---
+
+# リクエスト、トランザクション、識別子
