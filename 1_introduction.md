@@ -764,8 +764,13 @@ ZookKeeperはクライアントが観測する更新の順序を保証する�
 
 ---
 
-# バージョン
+# Masterフェイルオーバーの例
 
+1. `create("/master")`を`CreateMode.EPHEMERAL`で呼び`"/master"`短命znodeを作ってMasterに立候補する
+2. 成功したらMasterとして選出された
+3. `Code.NODEEXISTS`で失敗したら、Masterがすでに存在するので、`exists("master")`を監視つきで呼ぶ
+4. existsが`Code.NONODE`で失敗したらその間にMasterが落ちたということなので再度Masterに立候補するため1に戻る
+5. existsの監視の通知が発火し`EventType.NodeDeleted`だったならMasterが落ちて短命znodeが消えたということなので1に戻りMasterに立候補する
 
 ---
 
